@@ -1,7 +1,6 @@
-require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
+const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
@@ -13,35 +12,37 @@ app.use(express.json());
 // Serve static files from the current directory
 app.use(express.static(__dirname));
 
-const uri = process.env.MONGODB_URI;
-if (!uri) {
-    console.error("MONGODB_URI is not set!");
-}
+const dataFile = path.join(__dirname, 'feedbacks.json');
 
-let client;
-let clientPromise;
-
-if (uri) {
-    client = new MongoClient(uri);
-    clientPromise = client.connect().catch(err => console.error('MongoDB Connection Error:', err));
+// Ensure the JSON file exists
+async function initDb() {
+    try {
+        await fs.access(dataFile);
+    } catch {
+        await fs.writeFile(dataFile, JSON.stringify([]));
+    }
 }
+initDb();
 
 // API endpoint to submit feedback
 app.post('/api/submitFeedback', async (req, res) => {
     try {
-        if (!clientPromise) throw new Error("Database not connected");
-        await clientPromise;
-        
-        const db = client.db("birthday_db");
-        const collection = db.collection("feedbacks");
-
         const payload = req.body;
         if (!payload.timestamp) {
             payload.timestamp = new Date().toISOString();
         }
 
-        const result = await collection.insertOne(payload);
-        res.status(200).json({ success: true, id: result.insertedId });
+        // Read current data
+        const fileContent = await fs.readFile(dataFile, 'utf8');
+        const data = JSON.parse(fileContent);
+        
+        // Add new feedback
+        data.push(payload);
+        
+        // Save back to file
+        await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+
+        res.status(200).json({ success: true });
     } catch (error) {
         console.error("Submit Feedback Error:", error);
         res.status(500).json({ error: 'Failed to insert feedback', details: error.message });
@@ -51,14 +52,13 @@ app.post('/api/submitFeedback', async (req, res) => {
 // API endpoint to get feedbacks
 app.get('/api/getFeedbacks', async (req, res) => {
     try {
-        if (!clientPromise) throw new Error("Database not connected");
-        await clientPromise;
+        const fileContent = await fs.readFile(dataFile, 'utf8');
+        const data = JSON.parse(fileContent);
         
-        const db = client.db("birthday_db");
-        const collection = db.collection("feedbacks");
+        // Sort descending by timestamp
+        data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        const documents = await collection.find({}).sort({ timestamp: -1 }).toArray();
-        res.status(200).json({ documents });
+        res.status(200).json({ documents: data });
     } catch (error) {
         console.error("Get Feedbacks Error:", error);
         res.status(500).json({ error: 'Failed to fetch feedbacks', details: error.message });

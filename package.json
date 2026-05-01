@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "Birthday App with Vercel and MongoDB",
   "scripts": {
-    "start": "vercel dev"
+    "start": "node server.js"
   },
   "dependencies": {
-    "@vercel/postgres": "^0.10.0"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.2.0"
   }
 }

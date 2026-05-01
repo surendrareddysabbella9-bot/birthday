@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
         res.status(200).json({ success: true });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to insert feedback' });
+        console.error("Vercel API Error:", error);
+        res.status(500).json({ error: 'Failed to insert feedback', details: error.message || String(error) });
     }
 }

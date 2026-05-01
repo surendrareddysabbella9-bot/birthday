@@ -272,7 +272,11 @@ document.getElementById('feedback-form').addEventListener('submit', async (e) =>
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            console.error("Server Error Details:", errData);
+            throw new Error(`HTTP error! status: ${response.status} - ${errData.details || 'Unknown Error'}`);
+        }
         
         setRandomFinalQuote();
         showSection('section-final');

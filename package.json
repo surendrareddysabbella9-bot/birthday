@@ -1,0 +1,11 @@
+{
+  "name": "birthday-app",
+  "version": "1.0.0",
+  "description": "Birthday App with Vercel and MongoDB",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "mongodb": "^6.5.0"
+  }
+}

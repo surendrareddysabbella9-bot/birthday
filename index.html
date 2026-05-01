@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You Experience</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Background layers -->
+    <div id="background-container"></div>
+    <div id="particles-js"></div>
+
+    <main id="app">
+        <!-- 1. Entry Page - Puzzle -->
+        <section id="section-puzzle" class="active">
+            <div class="puzzle-wrapper">
+                <h1 class="glitch-text" data-text="ACCESS REQUIRED">ACCESS REQUIRED</h1>
+                <p class="subtitle">Complete the puzzle to enter</p>
+                <div class="puzzle-container drop-zone-container">
+                    <div id="puzzle-drop-board"></div>
+                </div>
+                <!-- Scatter Area -->
+                <div id="scatter-area"></div>
+                <div class="puzzle-actions"
+                    style="margin-top: 25px; display: flex; gap: 15px; justify-content: center;">
+                    <button id="btn-reset-puzzle" class="neon-btn neon-red"
+                        style="padding: 10px 20px; font-size: 0.85rem;">
+                        <span>Reset Puzzle</span>
+                    </button>
+                    <button id="btn-skip-puzzle" class="neon-btn neon-green"
+                        style="padding: 10px 20px; font-size: 0.85rem;">
+                        <span>Skip Mission</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Main Page - Hero / Profile -->
+        <section id="section-hero">
+            <div class="hero-content glass-card">
+                <div class="profile-glow-container">
+                    <img src="image3.png" alt="Profile" class="profile-img">
+                </div>
+                <h2>Thanks for being part of my journey.</h2>
+                <p class="hero-subtext">A quick checkpoint before we move forward.</p>
+                <button id="btn-continue" class="neon-btn neon-green">
+                    <span>Continue Mission</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Feedback Form Page -->
+        <section id="section-feedback">
+            <div class="form-card glass-card">
+                <h2>Honest Feedback</h2>
+                <form id="feedback-form">
+                    <div class="input-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" required placeholder="Who are you?">
+                    </div>
+                    <div class="input-group">
+                        <label for="liked">What do you like about me? *</label>
+                        <textarea id="liked" required rows="2" placeholder="Be honest..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="disliked">What is one thing you don't like about me?</label>
+                        <textarea id="disliked" rows="2" placeholder="Constructive criticism is welcome..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" required rows="2" placeholder="Drop your wishes here..."></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="fun1">If I were a gym exercise, what would I be? 😄 *</label>
+                        <input type="text" id="fun1" required placeholder="e.g. Deadlift, Burpee...">
+                    </div>
+                    <div class="input-group">
+                        <label for="fun2">One word that describes me? *</label>
+                        <input type="text" id="fun2" required placeholder="e.g. Relentless, Lazy...">
+                    </div>
+                    <button type="submit" class="neon-btn neon-red">
+                        <span>Submit Feedback</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. Final Thank You Page -->
+        <section id="section-final">
+            <div class="final-content glass-card">
+                <div class="profile-glow-container final-glow final-picture-container">
+                    <img src="image4.png" alt="Final Picture" class="profile-img">
+                </div>
+                <h2 id="dynamic-quote" class="gradient-text">Built with strength,<br>powered by friendships.</h2>
+                <p id="dynamic-thanks" class="final-subtext">Thanks for making my day unforgettable.</p>
+                <div class="actions">
+                    <button id="btn-replay" class="neon-btn neon-green">
+                        <span>Replay Experience</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

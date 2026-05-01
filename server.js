@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs').promises;
+const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
@@ -12,14 +12,36 @@ app.use(express.json());
 // Serve static files from the current directory
 app.use(express.static(__dirname));
 
-const dataFile = path.join(__dirname, 'feedbacks.json');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false // Required for Render Postgres connections
+    }
+});
 
-// Ensure the JSON file exists
+// Initialize database table
 async function initDb() {
+    if (!process.env.DATABASE_URL) {
+        console.warn("DATABASE_URL is not set. Database operations will fail.");
+        return;
+    }
+    
     try {
-        await fs.access(dataFile);
-    } catch {
-        await fs.writeFile(dataFile, JSON.stringify([]));
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS feedbacks (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(255),
+                liked_about_me TEXT,
+                dislike_about_me TEXT,
+                birthday_message TEXT,
+                fun_answer_1 VARCHAR(255),
+                fun_answer_2 VARCHAR(255),
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+        console.log("Database table initialized successfully.");
+    } catch (err) {
+        console.error("Database initialization failed:", err);
     }
 }
 initDb();
@@ -28,21 +50,23 @@ initDb();
 app.post('/api/submitFeedback', async (req, res) => {
     try {
         const payload = req.body;
-        if (!payload.timestamp) {
-            payload.timestamp = new Date().toISOString();
-        }
-
-        // Read current data
-        const fileContent = await fs.readFile(dataFile, 'utf8');
-        const data = JSON.parse(fileContent);
         
-        // Add new feedback
-        data.push(payload);
-        
-        // Save back to file
-        await fs.writeFile(dataFile, JSON.stringify(data, null, 2));
+        const query = `
+            INSERT INTO feedbacks (name, liked_about_me, dislike_about_me, birthday_message, fun_answer_1, fun_answer_2)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id;
+        `;
+        const values = [
+            payload.name || '',
+            payload.liked_about_me || '',
+            payload.dislike_about_me || '',
+            payload.birthday_message || '',
+            payload.fun_answer_1 || '',
+            payload.fun_answer_2 || ''
+        ];
 
-        res.status(200).json({ success: true });
+        const result = await pool.query(query, values);
+        res.status(200).json({ success: true, id: result.rows[0].id });
     } catch (error) {
         console.error("Submit Feedback Error:", error);
         res.status(500).json({ error: 'Failed to insert feedback', details: error.message });
@@ -52,13 +76,8 @@ app.post('/api/submitFeedback', async (req, res) => {
 // API endpoint to get feedbacks
 app.get('/api/getFeedbacks', async (req, res) => {
     try {
-        const fileContent = await fs.readFile(dataFile, 'utf8');
-        const data = JSON.parse(fileContent);
-        
-        // Sort descending by timestamp
-        data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-        res.status(200).json({ documents: data });
+        const result = await pool.query(`SELECT * FROM feedbacks ORDER BY timestamp DESC;`);
+        res.status(200).json({ documents: result.rows });
     } catch (error) {
         console.error("Get Feedbacks Error:", error);
         res.status(500).json({ error: 'Failed to fetch feedbacks', details: error.message });

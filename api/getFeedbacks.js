@@ -1,25 +1,4 @@
-import { MongoClient } from 'mongodb';
-
-const uri = process.env.MONGODB_URI;
-const options = {};
-
-let client;
-let clientPromise;
-
-if (!uri) {
-  throw new Error('Please add your Mongo URI to .env.local');
-}
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    global._mongoClientPromise = client.connect();
-  }
-  clientPromise = global._mongoClientPromise;
-} else {
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
-}
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
@@ -27,11 +6,26 @@ export default async function handler(req, res) {
     }
 
     try {
-        const client = await clientPromise;
-        const db = client.db("birthday_db");
-        const collection = db.collection("feedbacks");
+        // Ensure table exists before querying to avoid errors on empty database
+        await sql`CREATE TABLE IF NOT EXISTS feedbacks (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(255),
+            liked_about_me TEXT,
+            dislike_about_me TEXT,
+            birthday_message TEXT,
+            fun_answer_1 VARCHAR(255),
+            fun_answer_2 VARCHAR(255),
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );`;
 
-        const documents = await collection.find({}).sort({ timestamp: -1 }).toArray();
+        const { rows } = await sql`SELECT * FROM feedbacks ORDER BY timestamp DESC;`;
+        
+        // Postgres returns dates as objects, convert to standard ISO strings for the frontend
+        const documents = rows.map(row => ({
+            ...row,
+            timestamp: new Date(row.timestamp).toISOString()
+        }));
+
         res.status(200).json({ documents });
     } catch (error) {
         console.error(error);

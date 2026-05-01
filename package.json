@@ -6,6 +6,6 @@
     "start": "vercel dev"
   },
   "dependencies": {
-    "mongodb": "^6.5.0"
+    "@vercel/postgres": "^0.10.0"
   }
 }

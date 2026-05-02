@@ -165,7 +165,7 @@ function checkWin() {
         document.querySelector('.glitch-text').style.color = "var(--neon-green)";
         document.querySelector('.glitch-text').style.textShadow = "0 0 15px var(--neon-green)";
         setTimeout(() => {
-            showSection('section-hero');
+            showSection('section-feedback');
         }, 1200);
     }
 }
@@ -189,10 +189,6 @@ document.getElementById('btn-reset-puzzle').addEventListener('click', () => {
 });
 
 document.getElementById('btn-skip-puzzle').addEventListener('click', () => {
-    showSection('section-hero');
-});
-
-document.getElementById('btn-continue').addEventListener('click', () => {
     showSection('section-feedback');
 });
 

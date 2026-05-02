@@ -238,10 +238,12 @@ h1, h2 {
     position: absolute;
     width: 101px; /* (320 - 4*2 gap - 4*2 padding) / 3 = 101.33px roughly */
     height: 101px;
+    background-color: #ffffff;
     background-image: url('image2.png');
     background-size: 304px 304px; /* match inner width */
     cursor: grab;
     z-index: 100;
+    border: 2px solid #ffffff;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.6);
     border-radius: 4px;
     transition: box-shadow 0.2s ease, filter 0.2s ease;
